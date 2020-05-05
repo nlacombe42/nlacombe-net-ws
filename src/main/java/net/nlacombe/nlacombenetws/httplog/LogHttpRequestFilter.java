@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +33,7 @@ public class LogHttpRequestFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         var httpRequest = (HttpServletRequest) servletRequest;
         var httpServletResponse = (HttpServletResponse) servletResponse;
 
@@ -51,10 +53,12 @@ public class LogHttpRequestFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
 
             httpRequestEntity.setResponseStatus(httpServletResponse.getStatus());
-        } catch (Exception e) {
-            httpRequestEntity.setResponseStatus(null);
-        } finally {
             storeHttpRequestLogOrLogError(httpRequestEntity);
+        } catch (IOException | ServletException | RuntimeException exception) {
+            httpRequestEntity.setResponseStatus(null);
+            storeHttpRequestLogOrLogError(httpRequestEntity);
+
+            throw exception;
         }
     }
 
