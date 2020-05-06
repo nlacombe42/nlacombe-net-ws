@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RXBG</title>
+    <style type="text/css">
+        main {
+            width: 100%;
+        }
+
+        p {
+            width: 1024px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            display: block;
+            width: 1024px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <p>Game made for Raph's birthday. They told me that, in life, they like cats, dogs and giving love/affection.</p>
+        <p>WASD to move and SPACE for action. you can't move in 2 directions at once :P move up for a while when you start</p>
+        <canvas id="canvas" width="1024" height="768"></canvas>
+    </main>
+    <script type="application/javascript">
+        (function () {
+            "use strict";
+
+            var canvas;
+            var worldObjects;
+            var maskObjects;
+            var objectImageWidth;
+            var objectImageHeight;
+            var objectMargin;
+            var imagesByUrl;
+
+            function init() {
+                worldObjects = [];
+                maskObjects = [];
+                canvas = document.getElementById("canvas");
+                objectImageWidth = 300;
+                objectImageHeight = 300;
+                objectMargin = 100;
+                imagesByUrl = {};
+
+                let context = canvas.getContext("2d");
+                let playerPositionX = canvas.width / 2;
+                let playerViewWorldOffset = {x: 0, y: canvas.height};
+                let playerInputSinceLastFrame = true;
+
+                setInterval(() => {
+                    if (!playerInputSinceLastFrame)
+                        return;
+
+                    drawBackground(context);
+
+                    let isThereObjectsAtTopRight = false;
+                    let isThereObjectsAtTopLeft = false;
+
+                    worldObjects.forEach((worldObject) => {
+                        let canvasPosition = fromWorldPositionToCanvasPosition(playerViewWorldOffset, worldObject.position);
+
+                        if (worldObject.position.y <= playerViewWorldOffset.y + objectImageWidth + objectMargin &&
+                            worldObject.position.y >= playerViewWorldOffset.y) {
+
+                            if (worldObject.position.x > canvas.width / 2)
+                                isThereObjectsAtTopRight = true;
+                            else
+                                isThereObjectsAtTopLeft = true;
+                        }
+
+                        drawImageUrl(context, worldObject.imageUrl, canvasPosition.x, canvasPosition.y);
+                    });
+
+                    maskObjects.forEach((maskObject) => {
+                        let canvasPosition = fromWorldPositionToCanvasPosition(playerViewWorldOffset, maskObject.position);
+
+                        drawHeart(context, canvasPosition.x, canvasPosition.y, objectImageWidth, objectImageHeight, "#f00");
+                    });
+
+                    if (!isThereObjectsAtTopRight)
+                        createNewDog({x: canvas.width - objectImageWidth, y: playerViewWorldOffset.y + objectImageWidth + objectMargin});
+
+                    if (!isThereObjectsAtTopLeft)
+                        createNewCat({x: 0, y: playerViewWorldOffset.y + objectImageWidth + objectMargin});
+
+                    drawPlayer(context, playerPositionX);
+
+                    playerInputSinceLastFrame = false;
+                }, 100);
+
+                document.addEventListener("keydown", event => {
+                    let keyboardEventString = String.fromCharCode(event.keyCode);
+
+                    if (keyboardEventString === 'W') {
+                        playerViewWorldOffset.y += 5;
+                        playerInputSinceLastFrame = true;
+                    } else if (keyboardEventString === 'S') {
+                        playerViewWorldOffset.y -= 5;
+                        playerInputSinceLastFrame = true;
+                    } else if (keyboardEventString === 'A') {
+                        playerPositionX -= 5;
+                        playerInputSinceLastFrame = true;
+                    } else if (keyboardEventString === 'D') {
+                        playerPositionX += 5;
+                        playerInputSinceLastFrame = true;
+                    } else if (keyboardEventString === ' ') {
+                        let smallestDistanceObject = undefined;
+                        let smallestDistance = 1000000;
+                        let playerPosition = {
+                            x: playerPositionX,
+                            y: playerViewWorldOffset.y - canvas.height + 100
+                        };
+
+                        worldObjects.forEach((worldObject) => {
+                            let middlePosition = {
+                                x: worldObject.position.x + (objectImageWidth / 2),
+                                y: worldObject.position.y - (objectImageHeight / 2)
+                            };
+
+                            let distance = getDistance(playerPosition, middlePosition);
+
+                            if (distance < smallestDistance) {
+                                smallestDistanceObject = worldObject;
+                                smallestDistance = distance;
+                            }
+                        });
+
+                        if (smallestDistanceObject) {
+                            let middlePosition = {
+                                x: smallestDistanceObject.position.x + (objectImageWidth / 2),
+                                y: smallestDistanceObject.position.y
+                            };
+
+                            let hearthObject = createWorldObject({type: "hearth", position: middlePosition});
+                            maskObjects.push(hearthObject);
+                        }
+
+                        playerInputSinceLastFrame = true;
+                    }
+                });
+            }
+
+            function drawHeart(ctx, x, y, width, height, color) {
+                ctx.save();
+                ctx.beginPath();
+                var topCurveHeight = height * 0.3;
+                ctx.moveTo(x, y + topCurveHeight);
+                // top left curve
+                ctx.bezierCurveTo(
+                    x, y,
+                    x - width / 2, y,
+                    x - width / 2, y + topCurveHeight
+                );
+
+                // bottom left curve
+                ctx.bezierCurveTo(
+                    x - width / 2, y + (height + topCurveHeight) / 2,
+                    x, y + (height + topCurveHeight) / 2,
+                    x, y + height
+                );
+
+                // bottom right curve
+                ctx.bezierCurveTo(
+                    x, y + (height + topCurveHeight) / 2,
+                    x + width / 2, y + (height + topCurveHeight) / 2,
+                    x + width / 2, y + topCurveHeight
+                );
+
+                // top right curve
+                ctx.bezierCurveTo(
+                    x + width / 2, y,
+                    x, y,
+                    x, y + topCurveHeight
+                );
+
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.globalAlpha = 0.5;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function fromWorldPositionToCanvasPosition(playerViewWorldOffset, worldObjectPosition) {
+                return {
+                    x: worldObjectPosition.x,
+                    y: playerViewWorldOffset.y - worldObjectPosition.y
+                };
+            }
+
+            function getDistance(position1, position2) {
+                return Math.sqrt(Math.pow(position1.x - position2.x, 2) + Math.pow(position1.y - position2.y, 2));
+            }
+
+            function drawPlayer(context, playerPositionX) {
+                let radius = 50;
+                let position = {
+                    x: playerPositionX,
+                    y: canvas.height - radius - 100
+                };
+
+                drawFilledCircle(context, position, 50, "#000");
+            }
+
+            function drawFilledCircle(context, position, radius, color) {
+                context.fillStyle = color;
+                context.beginPath();
+                context.arc(position.x, position.y, radius, 0, 2 * Math.PI);
+                context.fill();
+            }
+
+            function createNewCat(position) {
+                let worldObject = createWorldObject({position});
+                worldObjects.push(worldObject);
+
+                getNewCatImageUrl().then((imageUrl) => worldObject.imageUrl = imageUrl);
+            }
+
+            function createNewDog(position) {
+                let worldObject = createWorldObject({position});
+                worldObjects.push(worldObject);
+
+                getNewDogImageUrl().then((imageUrl) => worldObject.imageUrl = imageUrl);
+            }
+
+            function createWorldObject(worldObject) {
+                return  {
+                    type: worldObject.type,
+                    imageUrl: worldObject.imageUrl,
+                    position: {
+                        x: worldObject.position && worldObject.position.x ? worldObject.position.x : 0,
+                        y: worldObject.position && worldObject.position.y ? worldObject.position.y : 0
+                    }
+                };
+            }
+
+            function getNewDogImageUrl() {
+                return ajaxGet('https://dog.ceo/api/breeds/image/random').then((response) => {
+                    return response.message;
+                });
+            }
+
+            function getNewCatImageUrl() {
+                return ajaxGet('https://api.thecatapi.com/v1/images/search?size=small&limit=1').then((response) => {
+                    return response[0]["url"];
+                });
+            }
+
+            function drawBackground(context) {
+                context.fillStyle = "#fff";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function drawImageUrl(canvas2dContext, imageUrl, positionX, positionY) {
+                if (!imageUrl)
+                    return;
+
+                let imageElement = imagesByUrl[imageUrl];
+
+                if (imageElement) {
+                    canvas2dContext.drawImage(imageElement, positionX, positionY, objectImageWidth, objectImageHeight);
+                } else {
+                    imageElement = new Image();
+                    imageElement.onload = function() {
+                        canvas2dContext.drawImage(imageElement, positionX, positionY, objectImageWidth, objectImageHeight);
+                    };
+                    imageElement.src = imageUrl;
+                    imagesByUrl[imageUrl] = imageElement;
+                }
+            }
+
+            function ajaxGet(url) {
+                return new Promise((resolve, reject) => {
+                    let xmlHttpRequest = new XMLHttpRequest();
+                    xmlHttpRequest.onreadystatechange = function() {
+                        if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200) {
+                            try {
+                                var responseEntity = JSON.parse(xmlHttpRequest.responseText);
+                            } catch (err) {
+                                reject(err.message + " in " + xmlHttpRequest.responseText);
+                                return;
+                            }
+
+                            resolve(responseEntity);
+                        }
+                    };
+
+                    xmlHttpRequest.open("GET", url, true);
+                    xmlHttpRequest.send();
+                });
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
