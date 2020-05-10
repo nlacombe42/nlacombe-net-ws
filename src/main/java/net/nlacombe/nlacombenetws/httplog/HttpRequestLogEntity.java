@@ -10,6 +10,8 @@ import javax.persistence.Table;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "http_request_logs")
@@ -17,7 +19,7 @@ public class HttpRequestLogEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int httpRequestId;
+    private long httpRequestId;
 
     private Instant createdAtTimestamp;
     private String method;
@@ -37,11 +39,16 @@ public class HttpRequestLogEntity {
         this.headers = new ArrayList<>();
     }
 
-    public int getHttpRequestId() {
+    public Map<String, String> getHeadersMap() {
+        return headers.stream()
+            .collect(Collectors.toMap(HttpRequestLogHeaderEntity::getHeaderName, HttpRequestLogHeaderEntity::getHeaderValue));
+    }
+
+    public long getHttpRequestId() {
         return httpRequestId;
     }
 
-    public void setHttpRequestId(int httpRequestId) {
+    public void setHttpRequestId(long httpRequestId) {
         this.httpRequestId = httpRequestId;
     }
 

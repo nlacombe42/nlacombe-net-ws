@@ -10,7 +10,7 @@ public class AuthorizationUtil {
     public static void validateUserIsNicolasLacombeSuperAdmin() {
         int userId = AuthUtil.getAuthenticatedUser().getUserId();
 
-        if (NICOLAS_LACOMBE_USER_ID == userId)
+        if (NICOLAS_LACOMBE_USER_ID != userId)
             throw new AccessDeniedInternalRestException("Access denied.");
     }
 }
