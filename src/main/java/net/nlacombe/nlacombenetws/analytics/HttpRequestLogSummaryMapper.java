@@ -1,6 +1,6 @@
 package net.nlacombe.nlacombenetws.analytics;
 
-import net.nlacombe.nlacombenetws.ApplicationConstants;
+import net.nlacombe.nlacombenetws.shared.ApplicationConstants;
 import net.nlacombe.nlacombenetws.httplog.HttpRequestLogEntity;
 import net.nlacombe.nlacombenetws.shared.BeanMapper;
 import org.springframework.stereotype.Component;

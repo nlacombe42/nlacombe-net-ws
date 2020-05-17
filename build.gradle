@@ -26,6 +26,8 @@ sourceCompatibility = 13
 targetCompatibility = 13
 
 def springCloudVersion = 'Hoxton.SR4'
+def junitVersion = '5.3.1'
+
 project.ext.gcloudBuildDir = file('build/gcloud-build/')
 project.ext.gcloudProjectId = 'nlacombe-net-prod'
 
@@ -53,6 +55,13 @@ dependencies {
 
 	runtimeOnly 'ch.qos.logback:logback-classic:1.2.3'
     runtimeOnly 'mysql:mysql-connector-java:8.0.18'
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.assertj:assertj-core:3.16.1'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 
 repositories {
@@ -62,6 +71,10 @@ repositories {
 
 wrapper {
 	gradleVersion = '6.3'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 idea {

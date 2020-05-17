@@ -1,4 +1,4 @@
-package net.nlacombe.nlacombenetws;
+package net.nlacombe.nlacombenetws.shared;
 
 import java.time.ZoneId;
 

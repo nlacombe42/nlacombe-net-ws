@@ -2,6 +2,7 @@ package net.nlacombe.nlacombenetws.httplog;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,7 +27,7 @@ public class HttpRequestLogEntity {
     private String uri;
     private Integer responseStatus;
 
-    @OneToMany(mappedBy = "httpRequest", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "httpRequest", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<HttpRequestLogHeaderEntity> headers;
 
     public HttpRequestLogEntity() {
@@ -40,7 +41,7 @@ public class HttpRequestLogEntity {
     }
 
     public Map<String, String> getHeadersMap() {
-        return headers.stream()
+        return getHeaders().stream()
             .collect(Collectors.toMap(HttpRequestLogHeaderEntity::getHeaderName, HttpRequestLogHeaderEntity::getHeaderValue));
     }
 
