@@ -1,6 +1,6 @@
-package net.nlacombe.nlacombenetws.analytics;
+package net.nlacombe.nlacombenetws.features.analytics;
 
-import net.nlacombe.nlacombenetws.httplog.HttpRequestLogJpaRepository;
+import net.nlacombe.nlacombenetws.features.httplog.HttpRequestLogJpaRepository;
 import net.nlacombe.nlacombenetws.security.AuthorizationUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package net.nlacombe.nlacombenetws.httplog;
+package net.nlacombe.nlacombenetws.features.httplog;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

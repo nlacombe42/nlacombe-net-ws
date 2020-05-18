@@ -1,4 +1,4 @@
-package net.nlacombe.nlacombenetws.analytics;
+package net.nlacombe.nlacombenetws.features.analytics;
 
 import java.util.Map;
 

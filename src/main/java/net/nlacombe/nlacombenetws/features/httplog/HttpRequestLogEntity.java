@@ -1,4 +1,4 @@
-package net.nlacombe.nlacombenetws.httplog;
+package net.nlacombe.nlacombenetws.features.httplog;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
