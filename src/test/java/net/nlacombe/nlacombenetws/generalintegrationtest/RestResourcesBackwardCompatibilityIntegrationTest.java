@@ -1,5 +1,6 @@
 package net.nlacombe.nlacombenetws.generalintegrationtest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.nlacombe.nlacombenetws.test.TestConfig;
 import net.nlacombe.nlacombenetws.test.TestHttpClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,7 @@ public class RestResourcesBackwardCompatibilityIntegrationTest {
     public void init() {
         var testConfig = new TestConfig(environment);
 
-        testHttpClient = new TestHttpClient(testConfig, testRestTemplate);
+        testHttpClient = new TestHttpClient(testConfig, testRestTemplate, new ObjectMapper());
     }
 
     @Test

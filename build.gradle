@@ -41,6 +41,8 @@ dependencyManagement {
 }
 
 dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-devtools'
+
     implementation 'net.nlacombe:auth-lib:10.0.0'
 
     implementation 'org.springframework.cloud:spring-cloud-gcp-starter'
@@ -96,7 +98,7 @@ task buildDocker(type: Docker, dependsOn: assemble) {
 	}
 }
 
-task buildGcloudDockerImage(type: Exec, dependsOn: assemble) {
+task buildGcloudDockerImage(type: Exec, dependsOn: [assemble, check]) {
 	def buildStartTime = new Date()
 	gcloudDockerImageUrl = getGcloudDockerImageUrl(buildStartTime)
 
