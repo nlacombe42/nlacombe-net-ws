@@ -54,6 +54,8 @@ dependencies {
     implementation 'org.flywaydb:flyway-core:6.4.1'
 	implementation 'javax.inject:javax.inject:1'
 	implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'com.vladsch.flexmark:flexmark-all:0.61.28'
+    implementation 'org.apache.commons:commons-lang3:3.10'
 
 	runtimeOnly 'ch.qos.logback:logback-classic:1.2.3'
     runtimeOnly 'mysql:mysql-connector-java:8.0.18'
