@@ -40,6 +40,15 @@ public class TestHttpClient {
     public boolean resourceExistsFollowRedirects(String uri) {
         var response = restTemplate.exchange(uri, HttpMethod.GET, null, String.class);
 
+        if (response.getStatusCode().is3xxRedirection()) {
+            var locationHeaderValue = response.getHeaders().getLocation();
+
+            if (locationHeaderValue == null)
+                throw new RuntimeException("Error: redirect http response has no valid location header.");
+
+            return resourceExistsFollowRedirects(locationHeaderValue.toString());
+        }
+
         return response.getStatusCode().is2xxSuccessful();
     }
 

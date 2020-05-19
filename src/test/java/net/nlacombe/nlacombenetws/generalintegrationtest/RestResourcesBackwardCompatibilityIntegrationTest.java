@@ -17,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.inject.Inject;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, args = "--spring.config.location=" + TestConfig.TESTED_APPLICATION_SPRING_CONFIG_FILE_PATH)
 @TestPropertySource(locations = "file:" + TestConfig.TEST_APPLICATION_CONFIG_FILE_PATH)
@@ -47,7 +49,6 @@ public class RestResourcesBackwardCompatibilityIntegrationTest {
             .filter(resourceUri -> !testHttpClient.resourceExistsFollowRedirects(resourceUri))
             .collect(Collectors.toList());
 
-        if (!nonExitingLoggedResources.isEmpty())
-            throw new RuntimeException("Following logged resources no longer exists: " + nonExitingLoggedResources);
+        assertThat(nonExitingLoggedResources).isEmpty();
     }
 }
