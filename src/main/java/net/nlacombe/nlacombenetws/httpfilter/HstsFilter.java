@@ -1,5 +1,6 @@
 package net.nlacombe.nlacombenetws.httpfilter;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.Filter;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Order(HttpFilterOrder.HSTS)
 public class HstsFilter implements Filter {
 
     @Override
