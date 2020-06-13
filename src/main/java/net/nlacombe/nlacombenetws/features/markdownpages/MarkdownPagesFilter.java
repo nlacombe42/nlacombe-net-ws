@@ -75,6 +75,7 @@ public class MarkdownPagesFilter implements Filter {
     private String getHtmlDocumentHeader(String pageTitle, Charset charset) {
         var htmlHeader = "<head>\n";
         htmlHeader += "<meta charset=\"" + charset.name() + "\">\n";
+        htmlHeader += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n";
         htmlHeader += "<title>" + pageTitle + "</title>\n";
         htmlHeader += "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n";
         htmlHeader += "</head>\n";
