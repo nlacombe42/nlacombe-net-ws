@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nlacombe-net-ws
+  labels:
+    app: nlacombe-net-ws
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nlacombe-net-ws
+  template:
+    metadata:
+      labels:
+        app: nlacombe-net-ws
+    spec:
+      containers:
+        - name: nlacombe-net-ws
+          image: gcr.io/nlacombe-net-prod/nlacombe-net-ws:0.1.1-20200613183215
+          env:
+            - name: PORT
+              value: "80"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nlacombe-net-ws-config
+              mountPath: /app/config
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+      volumes:
+        - name: nlacombe-net-ws-config
+          secret:
+            secretName: nlacombe-net-ws-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nlacombe-net-ws
+spec:
+  selector:
+    app: nlacombe-net-ws
+  ports:
+    - port: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nlacombe-net-ws
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: https
+spec:
+  rules:
+    - host: nlacombe.net
+      http:
+        paths:
+          - backend:
+              serviceName: nlacombe-net-ws
+              servicePort: 80
