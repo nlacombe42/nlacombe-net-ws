@@ -1,4 +1,4 @@
-FROM openjdk:13.0.2
+FROM openjdk:14.0.1
 COPY startApp.sh /app/startApp.sh
 RUN chmod u+x /app/startApp.sh
 ENTRYPOINT ["/app/startApp.sh"]

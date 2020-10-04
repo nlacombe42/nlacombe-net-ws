@@ -7,7 +7,7 @@ import java.nio.file.Path;
 public class TestConfig {
 
     public static final String APPLICATION_CONFIGURATION_FOLDER_PATH = "/opt/net.nlacombe/nlacombe-net-ws/";
-    public static final String TESTED_APPLICATION_SPRING_CONFIG_FILE_PATH = APPLICATION_CONFIGURATION_FOLDER_PATH + "application.yaml";
+    public static final String TESTED_APPLICATION_SPRING_CONFIG_FILE_PATH = APPLICATION_CONFIGURATION_FOLDER_PATH + "application-local.yaml";
     public static final String TEST_APPLICATION_CONFIG_FILE_PATH = APPLICATION_CONFIGURATION_FOLDER_PATH + "testConfig.yaml";
 
     private final Environment environment;

@@ -16,7 +16,7 @@ public class HttpRequestLogSummaryMapper extends BeanMapper<HttpRequestLogSummar
     public HttpRequestLogSummaryDto mapToDto(HttpRequestLogEntity entity) {
         var dto = super.mapToDto(entity);
         dto.setCreatedAtDatetime(entity.getCreatedAtTimestamp().atZone(ApplicationConstants.DEFAULT_USER_ZONE));
-        dto.setHost(entity.getHeadersMap().get("host"));
+        dto.setHost(entity.getHeaderWithOnlyOneValue("host"));
 
         return dto;
     }

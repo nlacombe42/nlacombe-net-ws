@@ -1,5 +1,7 @@
 package net.nlacombe.nlacombenetws.features.httplog;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -40,9 +42,27 @@ public class HttpRequestLogEntity {
         this.headers = new ArrayList<>();
     }
 
-    public Map<String, String> getHeadersMap() {
+    public Map<String, List<String>> getHeadersMap() {
         return getHeaders().stream()
-            .collect(Collectors.toMap(HttpRequestLogHeaderEntity::getHeaderName, HttpRequestLogHeaderEntity::getHeaderValue));
+            .collect(Collectors.groupingBy(HttpRequestLogHeaderEntity::getHeaderName, Collectors.mapping(
+                HttpRequestLogHeaderEntity::getHeaderValue,
+                Collectors.toList()
+            )));
+    }
+
+    public String getHeaderWithOnlyOneValue(String headerName) {
+        var headerValues = getHeaders().stream()
+            .filter(httpRequestLogHeaderEntity -> StringUtils.equalsIgnoreCase(httpRequestLogHeaderEntity.getHeaderName(), headerName))
+            .map(HttpRequestLogHeaderEntity::getHeaderValue)
+            .collect(Collectors.toSet());
+
+        if (headerValues.isEmpty())
+            return null;
+
+        if (headerValues.size() > 1)
+            throw new RuntimeException("Header has multiple values.");
+
+        return headerValues.iterator().next();
     }
 
     public long getHttpRequestId() {
