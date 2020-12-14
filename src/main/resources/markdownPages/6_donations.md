@@ -47,6 +47,7 @@ the value listed probably includes a mix of intrinsic and instrumental values, t
   unfortunately I do not know any non-profit organizations or charities working on this that accepts donation, if you think you might know one, [please comment on this question on the effective altruism forum](https://forum.effectivealtruism.org/posts/Sy9wsGFkZZkYifwwq/effective-charities-for-improving-institutional-decision)
 - **Improving effective altruism**  
   I think that helping and promoting [effective altruism](https://www.effectivealtruism.org/articles/introduction-to-effective-altruism/) is instrumental to all of the goals/values listed on this page
+- **Improving the lesswrong/rationalist community**  
 - **Reducing animal suffering**  
   see the *Reducing suffering* point under the *My altruistic values* section of this page
 - **Reducing human suffering and health issues**  
@@ -83,6 +84,9 @@ my favorite ea funds are listed below
 - givedirectly: [https://www.givedirectly.org/](https://www.givedirectly.org/)
     - Cause: **Empowering humans and decreasing poverty**
     - donation link: [https://donate.givedirectly.org/](https://donate.givedirectly.org/)
+- Center for Applied Rationality
+  - Cause: **Improving the lesswrong/rationalist community**
+  - donation link: [https://www.lesswrong.com/donate](https://www.lesswrong.com/donate)
 
 This is a list of organizations for which I do not know if they are especially effective or not, but that I support
 
