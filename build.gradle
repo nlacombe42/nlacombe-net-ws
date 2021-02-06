@@ -17,13 +17,8 @@ plugins {
 
 apply plugin: 'docker'
 
-defaultTasks 'tasks'
-
 group = 'net.nlacombe'
 version = '0.4.1'
-
-sourceCompatibility = 11
-targetCompatibility = 11
 
 def springCloudVersion = 'Hoxton.SR4'
 def junitVersion = '5.3.1'
@@ -68,13 +63,18 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 repositories {
 	mavenCentral()
 	mavenLocal()
 }
 
 wrapper {
-	gradleVersion = '6.3'
+	gradleVersion = '6.8.1'
 }
 
 test {
@@ -88,7 +88,7 @@ idea {
 	}
 }
 
-task buildDocker(type: Docker, dependsOn: assemble) {
+task buildDockerImage(type: Docker, dependsOn: assemble) {
 	tag = "${project.name}"
 	dockerfile = file('src/main/docker/Dockerfile')
 	doFirst {

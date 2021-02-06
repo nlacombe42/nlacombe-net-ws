@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: nlacombe-net-ws
-          image: gcr.io/nlacombe-net-prod/nlacombe-net-ws:0.4.1-20201213195314
+          image: gcr.io/nlacombe-net-prod/nlacombe-net-ws:0.4.1-20210206155929
           env:
             - name: PORT
               value: "80"
@@ -27,12 +27,12 @@ spec:
               mountPath: /app/config
               readOnly: true
           resources:
-              requests:
-                  cpu: 10m
-                  memory: 200Mi
-              limits:
-                  cpu: 600m
-                  memory: 284Mi
+            requests:
+              cpu: 10m
+              memory: 200Mi
+            limits:
+              cpu: 600m
+              memory: 284Mi
       volumes:
         - name: nlacombe-net-ws-config
           secret:
