@@ -1,12 +1,23 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400&display=swap');
 
+:root {
+    --page-container-width: 750px;
+    --main-bg-color: #23272b;
+    --main-text-color: #dadce0;
+    --main-text-font-size: 20px;
+    --main-text-line-height: 1.5em;
+    --main-link-color: #70b1e6;
+    --main-link-visited-color: #275B84;
+}
+
 html, body {
-    background-color: #23272b;
-    color: #dadce0;
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
 
     font-family: 'Roboto', sans-serif;
-    font-size: 20px;
-    line-height: 1.5em;
+    font-size: var(--main-text-font-size);
+    line-height: var(--main-text-line-height);
 }
 
 nav a {
@@ -18,14 +29,20 @@ h1 {
 }
 
 a {
-    color: #70b1e6;
+    color: var(--main-link-color);
 }
 
 a:visited {
-    color: #275B84;
+    color: var(--main-link-visited-color);
 }
 
-.wrapper {
-    max-width: 750px;
+nav,main {
+    max-width: var(--page-container-width);
     margin: 0 auto;
+}
+
+.form-field {
+    display: block;
+    margin: 30px 0;
+    width: 100%;
 }
