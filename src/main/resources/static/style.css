@@ -39,6 +39,7 @@ a:visited {
 nav,main {
     max-width: var(--page-container-width);
     margin: 0 auto;
+    padding: 0 10px
 }
 
 .form-field {

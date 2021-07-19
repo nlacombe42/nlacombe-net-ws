@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -29,8 +29,8 @@ public class RestResourcesBackwardCompatibilityIntegrationTest {
     @Inject
     private Environment environment;
 
-    @Inject
-    private TestRestTemplate testRestTemplate;
+    @LocalServerPort
+    private int applicationPort;
 
     private TestHttpClient testHttpClient;
 
@@ -38,7 +38,7 @@ public class RestResourcesBackwardCompatibilityIntegrationTest {
     public void init() {
         var testConfig = new TestConfig(environment);
 
-        testHttpClient = new TestHttpClient(testConfig, testRestTemplate, new ObjectMapper());
+        testHttpClient = new TestHttpClient(testConfig, applicationPort, new ObjectMapper());
     }
 
     @Test
@@ -46,7 +46,7 @@ public class RestResourcesBackwardCompatibilityIntegrationTest {
         var resourcesUris = testHttpClient.getResourceListFromLoggedRequests();
 
         var nonExitingLoggedResources = resourcesUris.stream()
-            .filter(resourceUri -> !testHttpClient.resourceExistsFollowRedirects(resourceUri))
+            .filter(resourceUri -> !testHttpClient.resourceExists(resourceUri))
             .collect(Collectors.toList());
 
         assertThat(nonExitingLoggedResources).isEmpty();

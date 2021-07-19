@@ -1,17 +1,19 @@
 package net.nlacombe.nlacombenetws.test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import net.nlacombe.authlib.jwt.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
 
 public class TestHttpClient {
@@ -19,58 +21,71 @@ public class TestHttpClient {
     private static final Logger logger = LoggerFactory.getLogger(TestHttpClient.class);
 
     private final TestConfig testConfig;
-    private final RestTemplate restTemplate;
+    private final int applicationPort;
+    private final HttpClient httpClient;
     private final ObjectMapper jsonConverter;
 
-    public TestHttpClient(TestConfig testConfig, TestRestTemplate restTemplate, ObjectMapper jsonConverter) {
+    public TestHttpClient(TestConfig testConfig, int applicationPort, ObjectMapper jsonConverter) {
         this.testConfig = testConfig;
         this.jsonConverter = jsonConverter;
-        this.restTemplate = getTestRestTemplateWithAuthInterceptor(restTemplate);
+        this.applicationPort = applicationPort;
+        this.httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(3))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
     }
 
     public List<String> getResourceListFromLoggedRequests() {
-        var response = restTemplate.exchange("/analytics/resourceListFromLoggedRequests", HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {
-        });
+        try {
+            var httpResponse = getResourceResponse(getAbsoluteUri("/analytics/resourceListFromLoggedRequests"));
 
-        validateNotAnErrorResponse(response);
+            validateNotAnErrorResponse(httpResponse);
 
-        return response.getBody();
-    }
-
-    public boolean resourceExistsFollowRedirects(String uri) {
-        var response = restTemplate.exchange(uri, HttpMethod.GET, null, String.class);
-
-        if (response.getStatusCode().is3xxRedirection()) {
-            var locationHeaderValue = response.getHeaders().getLocation();
-
-            if (locationHeaderValue == null)
-                throw new RuntimeException("Error: redirect http response has no valid location header.");
-
-            return resourceExistsFollowRedirects(locationHeaderValue.toString());
+            return jsonConverter.readValue(httpResponse.body(), new TypeReference<>() {});
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
-
-        return response.getStatusCode().is2xxSuccessful();
     }
 
-    private void validateNotAnErrorResponse(ResponseEntity<?> response) {
-        if (response.getStatusCode().isError())
+    public HttpResponse<InputStream> getResourceResponse(String uri) {
+        try {
+            var httpRequestBuilder = HttpRequest.newBuilder(URI.create(getAbsoluteUri(uri)));
+            httpRequestBuilder = addAuthHeader(httpRequestBuilder);
+            var httpRequest = httpRequestBuilder.build();
+
+            return httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+        } catch (IOException | InterruptedException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    public boolean resourceExists(String uri) {
+        var httpResponse = getResourceResponse(getAbsoluteUri(uri));
+
+        return httpResponse.statusCode() >= 200 && httpResponse.statusCode() <= 299;
+    }
+
+    private void validateNotAnErrorResponse(HttpResponse<?> response) {
+        if (response.statusCode() >= 400 && response.statusCode() <= 599)
             throw new RuntimeException("Error getting resource list from logged requests");
     }
 
-    private RestTemplate getTestRestTemplateWithAuthInterceptor(TestRestTemplate testRestTemplate) {
-        var restTemplate = testRestTemplate.getRestTemplate();
+    private HttpRequest.Builder addAuthHeader(HttpRequest.Builder httpRequestBuilder) {
+        var authToken = testConfig.getAuthToken();
 
-        restTemplate.setInterceptors(Collections.singletonList((httpRequest, body, clientHttpRequestExecution) -> {
-            var authToken = testConfig.getAuthToken();
+        logWarningIfAuthTokenIsExpired(authToken);
 
-            logWarningIfAuthTokenIsExpired(authToken);
+        return httpRequestBuilder.header("Authorization", "Bearer " + authToken);
+    }
 
-            httpRequest.getHeaders().add("Authorization", "Bearer " + authToken);
+    private String getAbsoluteUri(String uriText) {
+        var uri = URI.create(uriText);
 
-            return clientHttpRequestExecution.execute(httpRequest, body);
-        }));
+        return uri.isAbsolute() ? uri.toString() : URI.create(getBaseUrl() + uriText).toString();
+    }
 
-        return restTemplate;
+    private String getBaseUrl() {
+        return "http://localhost:" + applicationPort;
     }
 
     private void logWarningIfAuthTokenIsExpired(String authToken) {

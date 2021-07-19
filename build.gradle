@@ -18,10 +18,11 @@ plugins {
 apply plugin: 'docker'
 
 group = 'net.nlacombe'
-version = '1.0.0'
+version = '1.0.1'
 
 def springCloudVersion = 'Hoxton.SR4'
 def junitVersion = '5.3.1'
+def jacksonVersion = '2.9.6'
 
 project.ext.gcloudBuildDir = file('build/gcloud-build/')
 project.ext.gcloudProjectId = 'nlacombe-net-prod'
@@ -38,7 +39,7 @@ dependencyManagement {
 dependencies {
     compileOnly 'org.springframework.boot:spring-boot-devtools'
 
-    implementation 'net.nlacombe:auth-lib:10.0.0'
+    implementation 'net.nlacombe:auth-lib:12.0.1'
 
     implementation 'org.springframework.cloud:spring-cloud-gcp-starter'
     implementation 'org.springframework.cloud:spring-cloud-gcp-starter-sql-mysql'
@@ -51,6 +52,7 @@ dependencies {
 	implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'com.vladsch.flexmark:flexmark-all:0.61.28'
     implementation 'org.apache.commons:commons-lang3:3.10'
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
 	runtimeOnly 'ch.qos.logback:logback-classic:1.2.3'
     runtimeOnly 'mysql:mysql-connector-java:8.0.18'
@@ -59,6 +61,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.assertj:assertj-core:3.16.1'
     testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    testImplementation 'org.jsoup:jsoup:1.13.1'
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
@@ -74,7 +79,7 @@ repositories {
 }
 
 wrapper {
-	gradleVersion = '6.8.1'
+	gradleVersion = '7.1.1'
 }
 
 test {

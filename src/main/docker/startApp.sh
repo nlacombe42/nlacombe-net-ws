@@ -1,3 +1,11 @@
 #!/bin/bash
 
-java -Djava.security.egd=file:/dev/./urandom -Xms100m -Xmx280m -jar /app/app.jar --spring.config.location=/app/config/application.yaml --server.port=${PORT}
+command="java -Xms100m -Xmx280m"
+command+=" -Djava.security.egd=file:///dev/urandom"
+command+=" -Dspring.profiles.active=native"
+command+=" -Dspring.config.location=file:///app/config/application.yaml"
+command+=" -Dserver.port=${PORT}"
+command+=" -jar app.jar"
+
+echo "$command"
+$command

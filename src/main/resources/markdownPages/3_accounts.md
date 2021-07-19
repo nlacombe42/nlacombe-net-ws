@@ -3,7 +3,7 @@ Here is a list of accounts I have on different platforms/apps/etc.
 
 - Social media
     - [Facebook](https://www.facebook.com/nlacombe42)
-    - [Linkedin](https://www.linkedin.com/in/nicolas-lacombe-49b5b025)
+    - [Linkedin](https://www.linkedin.com/in/nlacombe)
     - [Twitter](https://twitter.com/nlacombe42)
     - [Reddit](https://www.reddit.com/user/nlacombe)
 - Games
